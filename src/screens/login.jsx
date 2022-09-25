@@ -7,11 +7,28 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 import StatsBar from "../components/statusbar";
+import { loginUser } from "../api/auth/loginuser";
 
 export default function Login() {
+  const [userInfo, setUserInfo] = useState({ username: "", password: "" });
+  const navigation = useNavigation();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    if (userInfo.username && userInfo.password) {
+      const result = await loginUser(userInfo);
+      console.log(result);
+    } else {
+      console.log("Complete the fields");
+      return;
+    }
+  };
+
   return (
     <SafeAreaView style={styles.parentContainer}>
       <StatsBar />
@@ -21,7 +38,11 @@ export default function Login() {
         </View>
         <View style={styles.inputContainer}>
           <Text>Username</Text>
-          <TextInput style={styles.input} placeholder="JohnDoe" />
+          <TextInput
+            style={styles.input}
+            placeholder="JohnDoe"
+            onChangeText={(e) => setUserInfo({ ...userInfo, username: e })}
+          />
           <Text>Password</Text>
           <TextInput
             style={styles.input}
@@ -31,12 +52,25 @@ export default function Login() {
             autoComplete="off"
             textContentType="password"
             placeholder="********"
+            onChangeText={(e) => setUserInfo({ ...userInfo, password: e })}
           />
         </View>
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.buttonLogin}>
-            <Text style={styles.buttonText}>Login</Text>
+        <View style={styles.loginContainer}>
+          <Pressable style={styles.button.container} onPress={handleLogin}>
+            <Text style={styles.button.text}>Login</Text>
           </Pressable>
+        </View>
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupMessage.text}>New?</Text>
+          <Pressable>
+            <Text
+              style={styles.signupMessage.button}
+              onPress={() => navigation.push("Signup")}
+            >
+              Sign-up
+            </Text>
+          </Pressable>
+          <Text style={styles.signupMessage.text}>for a new account</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -45,7 +79,7 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   parentContainer: {
-    backgroundColor: "#FFD700",
+    backgroundColor: "#F4D03F",
     height: "100%",
     width: "100%",
     paddingTop: StatusBar.currentHeight,
@@ -62,9 +96,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 90,
-    textAlign: "center",
     margin: 50,
+    textAlign: "center",
     fontWeight: "900",
+    color: "#B7950B",
   },
   inputContainer: {
     width: "80%",
@@ -79,22 +114,45 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 10,
   },
-  buttonContainer: {
+  loginContainer: {
     flex: 1,
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
   },
-  buttonLogin: {
-    width: "90%",
-    height: 50,
-    backgroundColor: "#000",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 5,
+  button: {
+    container: {
+      height: 50,
+      borderRadius: 5,
+      marginVertical: 5,
+      width: "90%",
+      backgroundColor: "#7D6608",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    text: {
+      color: "#F7DC6F",
+      fontSize: 20,
+    },
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 20,
+  signupContainer: {
+    height: 50,
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  signupMessage: {
+    text: {
+      fontSize: 15,
+      marginHorizontal: 2,
+      color: "#9A7D0A",
+    },
+    button: {
+      fontSize: 15,
+      marginHorizontal: 2,
+      color: "#000",
+    },
   },
 });
